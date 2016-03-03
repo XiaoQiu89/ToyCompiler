@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>35a43094-bb66-4467-aafc-13cb32c0adf1</ProjectGuid>
+    <ProjectGuid>{BC666D91-4B49-486F-BA29-0868A5DD1847}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ToyCompiler.Test</RootNamespace>
@@ -46,6 +46,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ToyCompiler.Scanner\ToyCompiler.Scanner.csproj">
+      <Project>{baf74cc7-eda3-4fc3-b709-2ff60cd3e796}</Project>
+      <Name>ToyCompiler.Scanner</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
