@@ -43,11 +43,13 @@
     <Compile Include="Parser\ParserContext.cs" />
     <Compile Include="Parser\ParserEngine.cs" />
     <Compile Include="Parser\ParserHelper.cs" />
+    <Compile Include="Parser\SyntaxTree\AstNode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReaderExtention.cs" />
     <Compile Include="Text\BufferReader.cs" />
     <Compile Include="Text\SourceLocation.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
