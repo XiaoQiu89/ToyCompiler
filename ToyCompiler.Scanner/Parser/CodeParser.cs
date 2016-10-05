@@ -20,11 +20,10 @@ namespace ToyCompiler.Scanner
 
         public void ParseFile()
         {
-            IList<string> codes = new List<string>();
+            IList<Token> codes = new List<Token>();
             do
             {
-                SkipWriteSpace();
-                codes.Add(Context.AcceptIdentifier());
+                codes.Add(Context.GetNextToken());
             } while (!EndOfFile);
         }
 

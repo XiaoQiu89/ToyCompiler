@@ -6,7 +6,7 @@ using System.IO;
 
 namespace ToyCompiler.Scanner
 {
-    public class BufferReader : TextReader
+    public class BufferReader : LookaheadTextReader
     {
         private SourceLocation location;
         private int _currentCharacter;
@@ -25,6 +25,14 @@ namespace ToyCompiler.Scanner
             get
             {
                 return _currentCharacter;
+            }
+        }
+
+        public override SourceLocation CurrentLocation
+        {
+            get
+            {
+                return location;
             }
         }
 

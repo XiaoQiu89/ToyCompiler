@@ -8,16 +8,71 @@ namespace ToyCompiler.Scanner
 {
     public class ParserContext
     {
-        internal TextReader reader;
+        internal LookaheadTextReader reader;
         private SourceLocation location;
         private CodeParser parser;
         private StringBuilder _primaryBuffer = new StringBuilder();
+        private IDictionary<char, TokenParser> parserHandlers 
+            = new Dictionary<char, TokenParser>();
+        public delegate TokenKind TokenParser();
+        private const int END_OF_FILE = 255;
 
-        public ParserContext(TextReader reader, CodeParser parser)
+        public ParserContext(LookaheadTextReader reader, CodeParser parser)
         {
             this.reader = reader;
             this.parser = parser;
-            location = new SourceLocation(1, 0);
+            //location = new SourceLocation(1, 0);
+            InitParser();
+        }
+
+        private void InitParser()
+        {
+            for (int i = 0; i < END_OF_FILE+1; i++)
+            {
+                char ch = (char)i;
+                if (ParserHelper.IsLetter(ch))
+                {
+                    parserHandlers[ch] = ParseIdentifier;
+                }
+
+                else if (ParserHelper.IsDicimalDigit(ch))
+                {
+                    parserHandlers[ch] = ParseNumber;
+                }
+
+                else
+                {
+                    parserHandlers[ch] = ParseBadChar;
+                }
+            }
+
+            parserHandlers['\''] = ParseSingleSynbol('\'', TokenKind.TK_INTCONST); // 解析字符
+            parserHandlers['\"'] = ParseSingleSynbol('\"', TokenKind.TK_STRING); // 解析字符串
+            parserHandlers['+'] = ParseSingleSynbol('+', TokenKind.TK_ADD);
+            parserHandlers['-'] = ParseSingleSynbol('-', TokenKind.TK_SUB);
+            parserHandlers['*'] = ParseSingleSynbol('*', TokenKind.TK_MUL);
+            parserHandlers['/'] = ParseSingleSynbol('/', TokenKind.TK_DIV);
+            parserHandlers['%'] = ParseSingleSynbol('%', TokenKind.TK_MOD);
+            parserHandlers['<'] = ParseSingleSynbol('<', TokenKind.TK_LESS);
+            parserHandlers['>'] = ParseSingleSynbol('>', TokenKind.TK_GREAT);
+            parserHandlers['!'] = ParseSingleSynbol('!', TokenKind.TK_NOT);
+            parserHandlers['='] = ParseSingleSynbol('=', TokenKind.TK_ASSIGN);
+            parserHandlers['|'] = ParseSingleSynbol('|', TokenKind.TK_BITOR);
+            parserHandlers['&'] = ParseSingleSynbol('&', TokenKind.TK_BITAND);
+            parserHandlers['^'] = ParseSingleSynbol('^', TokenKind.TK_BITXOR);
+            parserHandlers['.'] = ParseSingleSynbol('.', TokenKind.TK_DOT);
+
+            parserHandlers['{'] = ParseSingleSynbol('{', TokenKind.TK_LBRACE);
+            parserHandlers['}'] = ParseSingleSynbol('}', TokenKind.TK_RBRACE);
+            parserHandlers['['] = ParseSingleSynbol('[', TokenKind.TK_LBRACKET);
+            parserHandlers[']'] = ParseSingleSynbol(']', TokenKind.TK_RBRACKET);
+            parserHandlers['('] = ParseSingleSynbol('(', TokenKind.TK_LPAREN);
+            parserHandlers[')'] = ParseSingleSynbol(')', TokenKind.TK_RPAREN);
+            parserHandlers[','] = ParseSingleSynbol(',', TokenKind.TK_COMMA);
+            parserHandlers[';'] = ParseSingleSynbol(';', TokenKind.TK_SEMICOLON);
+            parserHandlers['~'] = ParseSingleSynbol('~', TokenKind.TK_COMP);
+            parserHandlers['?'] = ParseSingleSynbol('?', TokenKind.TK_QUESTION);
+            parserHandlers[':'] = ParseSingleSynbol(':', TokenKind.TK_COLON);
         }
 
         /// <summary>
@@ -48,6 +103,7 @@ namespace ToyCompiler.Scanner
         public SourceLocation CurrentLocation
         {
             get { return location; }
+            private set;
         }
 
         public bool HasContent { get { return _primaryBuffer.Length > 0; } }
@@ -94,13 +150,65 @@ namespace ToyCompiler.Scanner
             }
         }
 
-        public string AcceptIdentifier()
+        public TokenKind ParseIdentifier()
         {
-            if (ParserHelper.IsIdentifierPart(CurrentCharacter))
+            //if (ParserHelper.IsIdentifierPart(CurrentCharacter))
+            //{
+            //    return reader.ReadUtil(ch => ParserHelper.IsIdentifierPart(ch));
+            //}
+            //return null;
+            string identifier = reader.ReadUtil(ch => ParserHelper.IsIdentifierPart(ch));
+            _primaryBuffer.Append(identifier);
+            return TokenKind.TK_ID;
+        }
+
+        public TokenKind ParseNumber()
+        {
+            string Num = reader.ReadUtil(ch => ParserHelper.IsDicimalDigit(ch));
+            _primaryBuffer.Append(Num);
+            return TokenKind.TK_INT;
+        }
+
+        public TokenKind ParseBadChar()
+        {
+            SkipCurrent();
+            return NextToken();
+        }
+
+        public TokenKind NextToken()
+        {
+            ResetBuffers();
+            TokenKind token = parserHandlers[CurrentCharacter]();
+            // 关键字检测
+            return token;
+        }
+
+        public Token GetNextToken()
+        {
+            TokenKind kind = NextToken();
+            return new Token
             {
-                return reader.ReadUtil(ch => ParserHelper.IsIdentifierPart(ch));
-            }
-            return null;
+                Kind = kind,
+                Value = _primaryBuffer.ToString(),
+                Location = location
+            };
+        }
+
+        public TokenParser ParseSingleSynbol(char symbol, TokenKind kind)
+        {
+            return () =>
+            {
+                int ch = reader.Read();
+                if (ch == symbol) return kind;
+                return TokenKind.TK_END;
+            };
+        }
+
+        private void ResetBuffers()
+        {
+            _primaryBuffer.Clear();
+            reader.ReadWriteSpace();
+            CurrentLocation = reader.CurrentLocation;
         }
     }
 }

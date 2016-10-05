@@ -76,5 +76,6 @@ namespace ToyCompiler.Scanner
         {
             return Char.GetUnicodeCategory(value) == UnicodeCategory.ConnectorPunctuation;
         }
+
     }
 }

@@ -9,7 +9,7 @@ namespace ToyCompiler.Scanner
     /// <summary>
     /// 源代码文件位置信息
     /// </summary>
-    public class SourceLocation
+    public struct SourceLocation
     {
         private int _sourceLine;
         private int _sourceIndex;

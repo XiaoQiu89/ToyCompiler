@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace ToyCompiler.Scanner.Parser.SyntaxTree
+namespace ToyCompiler.Scanner
 {
-    public enum Token
+    public enum TokenKind
     {
         /// <summary>
         /// auto关键字
@@ -275,7 +275,7 @@ namespace ToyCompiler.Scanner.Parser.SyntaxTree
         /// </summary>
         TK_BITXOR, // ^
         /// <summary>
-        /// "^"运算符
+        /// &运算符
         /// </summary>
         TK_BITAND, // &
         /// <summary>
