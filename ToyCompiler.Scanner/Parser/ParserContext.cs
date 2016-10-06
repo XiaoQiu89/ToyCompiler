@@ -103,7 +103,7 @@ namespace ToyCompiler.Scanner
         public SourceLocation CurrentLocation
         {
             get { return location; }
-            private set;
+            private set { location = value; }
         }
 
         public bool HasContent { get { return _primaryBuffer.Length > 0; } }
@@ -199,6 +199,7 @@ namespace ToyCompiler.Scanner
             return () =>
             {
                 int ch = reader.Read();
+                _primaryBuffer.Append((char)ch);
                 if (ch == symbol) return kind;
                 return TokenKind.TK_END;
             };

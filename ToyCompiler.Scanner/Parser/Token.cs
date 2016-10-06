@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace ToyCompiler.Scanner
 {
+    [DebuggerDisplay("Kind({Kind}),Value({Value})")]
     public class Token
     {
         public TokenKind Kind { get; set; }

@@ -218,7 +218,7 @@ namespace ToyCompiler.Scanner
         /// <summary>
         /// "&="运算符
         /// </summary>
-        TK_LSHIFT_ASSIGN, // &=
+        //TK_LSHIFT_ASSIGN, // &=
 
         /// <summary>
         /// "<<="运算符
