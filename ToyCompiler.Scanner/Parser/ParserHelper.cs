@@ -1,11 +1,49 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace ToyCompiler.Scanner
 {
     public static class ParserHelper
     {
+        private static IDictionary<string, TokenKind> dic =
+            new Dictionary<string, TokenKind>
+            {
+                {"auto",TokenKind.TK_AUTO},
+                {"break",TokenKind.TK_BREAK},
+                {"case",TokenKind.TK_CASE},
+                {"char",TokenKind.TK_CHAR},
+                {"const",TokenKind.TK_CONST},
+                {"continue",TokenKind.TK_CONTINUE},
+                {"default",TokenKind.TK_DEFAULT},
+                {"do",TokenKind.TK_DO},
+                {"double",TokenKind.TK_DOUBLE},
+                {"else",TokenKind.TK_ELSE},
+                {"enum",TokenKind.TK_ENUM},
+                {"extern",TokenKind.TK_EXTERN},
+                {"float",TokenKind.TK_FLOAT},
+                {"for",TokenKind.TK_FOR},
+                {"goto",TokenKind.TK_GOTO},
+                {"if",TokenKind.TK_IF},
+                {"int",TokenKind.TK_INT},
+                {"int64",TokenKind.TK_INT64},
+                {"long",TokenKind.TK_LONG},
+                {"register",TokenKind.TK_REGISTER},
+                {"return",TokenKind.TK_RETURN},
+                {"short",TokenKind.TK_SHORT},
+                {"signed",TokenKind.TK_SIGNED},
+                {"sizeof",TokenKind.TK_SIZEOF},
+                {"static",TokenKind.TK_STATIC},
+                {"struct",TokenKind.TK_STRUCT},
+                {"switch",TokenKind.TK_SWITCH},
+                {"typedef",TokenKind.TK_TYPEDEF},
+                {"union",TokenKind.TK_UNION},
+                {"unsigned",TokenKind.TK_UNSIGNED},
+                {"void",TokenKind.TK_VOID},
+                {"volatile",TokenKind.TK_VOLATILE},
+                {"while",TokenKind.TK_WHILE}
+            };
 
         /// <summary>
         /// 检测字符是否是标示符的一部分
@@ -77,5 +115,12 @@ namespace ToyCompiler.Scanner
             return Char.GetUnicodeCategory(value) == UnicodeCategory.ConnectorPunctuation;
         }
 
+        public static TokenKind KeywordKind(string value)
+        {
+            string val = value.ToLower();
+            if (dic.Keys.Contains(val))
+                return dic[val];
+            return TokenKind.TK_ID;
+        }
     }
 }

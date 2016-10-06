@@ -159,7 +159,7 @@ namespace ToyCompiler.Scanner
             //return null;
             string identifier = reader.ReadUtil(ch => ParserHelper.IsIdentifierPart(ch));
             _primaryBuffer.Append(identifier);
-            return TokenKind.TK_ID;
+            return ParserHelper.KeywordKind(identifier);
         }
 
         public TokenKind ParseNumber()
