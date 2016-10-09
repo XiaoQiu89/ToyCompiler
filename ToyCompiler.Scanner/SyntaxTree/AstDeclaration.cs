@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace ToyCompiler.Scanner
 {
-    public class AstTranslationUnit
+    public class AstDeclaration : AstNode
     {
-        public AstNode ExtDecls { get; set; }
+        public AstSpecifiers Specifiers { get; set; }
+        public AstInitDeclarator Init { get; set; }
     }
 }
