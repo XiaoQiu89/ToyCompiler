@@ -9,7 +9,6 @@ namespace ToyCompiler.Scanner
     public class AstDeclarator : AstNode
     {
         public AstDeclarator Declarator { get; set; }
-        public string Name { get; set; }
     }
 
     public class AstPointerDeclarator : AstDeclarator
@@ -25,5 +24,10 @@ namespace ToyCompiler.Scanner
     public class AstFunctionDeclarator : AstDeclarator
     {
         public AstParameterTypeList ParamList { get; set; }
+    }
+    
+    public class AstNameDeclarator:AstDeclarator
+    {
+        public string Name{ get; set; }
     }
 }
