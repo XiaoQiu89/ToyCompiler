@@ -16,6 +16,7 @@ namespace ToyCompiler.Scanner
             = new Dictionary<char, TokenParser>();
         public delegate TokenKind TokenParser();
         private const int END_OF_FILE = 255;
+        private TokenKind _currentKind;
 
         public ParserContext(LookaheadTextReader reader, CodeParser parser)
         {
@@ -172,27 +173,29 @@ namespace ToyCompiler.Scanner
         public TokenKind ParseBadChar()
         {
             SkipCurrent();
-            return NextToken();
+            NextToken();
+            return TokenKind.TK_END;
         }
 
-        public TokenKind NextToken()
+        public void NextToken()
         {
             ResetBuffers();
-            TokenKind token = parserHandlers[CurrentCharacter]();
+            _currentKind = parserHandlers[CurrentCharacter]();
             // 关键字检测
-            return token;
+            //return token;
         }
 
         public Token GetNextToken()
         {
-            TokenKind kind = NextToken();
+            NextToken();
             return new Token
             {
-                Kind = kind,
+                Kind = _currentKind,
                 Value = _primaryBuffer.ToString(),
                 Location = location
             };
         }
+
 
         public TokenParser ParseSingleSynbol(char symbol, TokenKind kind)
         {

@@ -28,16 +28,28 @@ namespace ToyCompiler.Scanner
 
         public void ParseFile()
         {
-            IList<Token> codes = new List<Token>();
-            do
-            {
-                codes.Add(Context.GetNextToken());
-            } while (!EndOfFile);
+            //IList<Token> codes = new List<Token>();
+            //do
+            //{
+            //    codes.Add(Context.GetNextToken());
+            //} while (!EndOfFile);
+
+            AstTranslationUnit tran = ParseTranslationUnit();
+
         }
 
         protected void NextToken()
         {
             _token = Context.GetNextToken();
+        }
+
+        private void DoExpect(TokenKind kind)
+        {
+            if (CurrentToken.Kind == kind)
+            {
+                _token = Context.GetNextToken();
+                return;
+            }
         }
 
         /// <summary>
@@ -80,7 +92,7 @@ namespace ToyCompiler.Scanner
                 }
 
                 tail = ParseExternalDeclaration();
-                tail = tail.Next;
+                tail = tail.NextNode;
             }
 
 
@@ -89,7 +101,7 @@ namespace ToyCompiler.Scanner
 
         public AstNode ParseExternalDeclaration()
         {
-            AstDeclaration decl = new AstDeclaration();
+            AstDeclaration decl = ParseCommonHeader();
 
             return decl;
         }
@@ -101,7 +113,14 @@ namespace ToyCompiler.Scanner
 
             if (CurrentToken.Kind != TokenKind.TK_SEMICOLON)
             {
-
+                decl.Init = ParseInitDeclarator();
+                AstInitDeclarator _next = decl.Init.Next;
+                while (CurrentToken.Kind == TokenKind.TK_COMMA)
+                {
+                    NextToken();
+                    _next = ParseInitDeclarator();
+                    _next = _next.Next;
+                }
             }
 
             return decl;
@@ -111,59 +130,141 @@ namespace ToyCompiler.Scanner
         {
             AstSpecifiers specifiers = new AstSpecifiers();
 
-            switch (CurrentToken.Kind)
+            while (true)
             {
-                case TokenKind.TK_AUTO:
-                case TokenKind.TK_REGISTER:
-                case TokenKind.TK_STATIC:
-                case TokenKind.TK_EXTERN:
-                case TokenKind.TK_TYPEDEF:
-                    AstSpecifier spec = new AstSpecifier
-                    {
-                        Kind = NodeKind.NK_Specifiers,
-                        Token = CurrentToken
-                    };
-                    specifiers.StorageSpecifier = spec;
-                    NextToken();
-                    break;
+                switch (CurrentToken.Kind)
+                {
+                    case TokenKind.TK_AUTO:
+                    case TokenKind.TK_REGISTER:
+                    case TokenKind.TK_STATIC:
+                    case TokenKind.TK_EXTERN:
+                    case TokenKind.TK_TYPEDEF:
+                        AstSpecifier spec = new AstSpecifier
+                        {
+                            Kind = NodeKind.NK_Specifiers,
+                            Token = CurrentToken
+                        };
+                        specifiers.StorageSpecifier = spec;
+                        NextToken();
+                        break;
 
-                case TokenKind.TK_CONST:
-                case TokenKind.TK_VOLATILE:
-                    AstSpecifier tq = new AstSpecifier
-                    {
-                        Kind = NodeKind.NK_Specifiers,
-                        Token = CurrentToken
-                    };
-                    specifiers.TypeQualifier = tq;
-                    NextToken();
-                    break;
+                    case TokenKind.TK_CONST:
+                    case TokenKind.TK_VOLATILE:
+                        AstSpecifier tq = new AstSpecifier
+                        {
+                            Kind = NodeKind.NK_Specifiers,
+                            Token = CurrentToken
+                        };
+                        specifiers.TypeQualifier = tq;
+                        NextToken();
+                        break;
 
-                case TokenKind.TK_VOID:
-                case TokenKind.TK_CHAR:
-                case TokenKind.TK_SHORT:
-                case TokenKind.TK_INT:
-                case TokenKind.TK_INT64:
-                case TokenKind.TK_LONG:
-                case TokenKind.TK_FLOAT:
-                case TokenKind.TK_DOUBLE:
-                case TokenKind.TK_SIGNED:
-                case TokenKind.TK_UNSIGNED:
-                    AstSpecifier ts = new AstSpecifier
-                    {
-                        Kind = NodeKind.NK_Specifiers,
-                        Token = CurrentToken
-                    };
-                    specifiers.TypeSpecifier = ts;
-                    NextToken();
-                    break;
-                case TokenKind.TK_ID:
-                    return specifiers;
-                default:
-                    return specifiers;
-                    
+                    case TokenKind.TK_VOID:
+                    case TokenKind.TK_CHAR:
+                    case TokenKind.TK_SHORT:
+                    case TokenKind.TK_INT:
+                    case TokenKind.TK_INT64:
+                    case TokenKind.TK_LONG:
+                    case TokenKind.TK_FLOAT:
+                    case TokenKind.TK_DOUBLE:
+                    case TokenKind.TK_SIGNED:
+                    case TokenKind.TK_UNSIGNED:
+                        AstSpecifier ts = new AstSpecifier
+                        {
+                            Kind = NodeKind.NK_Specifiers,
+                            Token = CurrentToken
+                        };
+                        specifiers.TypeSpecifier = ts;
+                        NextToken();
+                        break;
+                    case TokenKind.TK_ID:
+                        return specifiers;
+                    default:
+                        return specifiers;
+
+                }
             }
-            return specifiers;
+            //return specifiers;
+        }
 
+        public AstInitDeclarator ParseInitDeclarator()
+        {
+            AstInitDeclarator initDec = new AstInitDeclarator();
+            initDec.Declarator = ParseDeclarator();
+            if (CurrentToken.Kind == TokenKind.TK_ASSIGN)
+            {
+                NextToken();
+                initDec.Initializer = null;// 解析赋值表达式
+            }
+            return initDec;
+        }
+
+        public AstDeclarator ParseDeclarator()
+        {
+            if (CurrentToken.Kind == TokenKind.TK_MUL)
+            {
+            }
+            return ParsePostfixDeclarator();
+        }
+
+        public AstDeclarator ParsePostfixDeclarator()
+        {
+            AstArrayDeclarator arrDecl = new AstArrayDeclarator();
+            AstFunctionDeclarator funDecl = new AstFunctionDeclarator();
+            AstDeclarator decl = ParseDirectDeclarator();
+
+            while (true)
+            {
+                if (CurrentToken.Kind == TokenKind.TK_LBRACKET)
+                {
+                    arrDecl.Declarator = decl;
+                    NextToken();
+                    if (CurrentToken.Kind != TokenKind.TK_RBRACKET)
+                    {
+                        arrDecl.Expr = null; // 解析表达式
+                    }
+                    DoExpect(TokenKind.TK_RBRACKET);
+                    return arrDecl;
+                }
+
+                else if (CurrentToken.Kind == TokenKind.TK_LPAREN)
+                {
+                    funDecl.Declarator = decl;
+                    NextToken();
+                    if (IsTypeName(CurrentToken.Kind))
+                    {
+                        funDecl.ParamList = null; // 解析函数参数列表
+                    }
+                    else
+                    {
+                        // 解析函数调用
+                    }
+                    DoExpect(TokenKind.TK_RPAREN);
+                    return funDecl;
+                }
+                else
+                {
+                    return decl;
+                }
+            }
+        }
+
+        public AstDeclarator ParseDirectDeclarator()
+        {
+            AstNameDeclarator decl = new AstNameDeclarator();
+            if (CurrentToken.Kind == TokenKind.TK_ID)
+            {
+                decl.Name = CurrentToken.Value;
+                decl.Kind = NodeKind.NK_Token;
+                decl.Token = CurrentToken;
+                NextToken();
+            }
+            return decl;
+        }
+
+        private bool IsTypeName(TokenKind kind)
+        {
+            return kind > TokenKind.TK_AUTO && kind < TokenKind.TK_VOID;
         }
     }
 }

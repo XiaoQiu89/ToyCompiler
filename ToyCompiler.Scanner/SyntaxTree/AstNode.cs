@@ -10,6 +10,6 @@ namespace ToyCompiler.Scanner
     {
         public NodeKind Kind { get; set; }
         public Token Token { get; set; }
-        public AstNode Next { get; set; }
+        public AstNode NextNode { get; set; }
     }
 }

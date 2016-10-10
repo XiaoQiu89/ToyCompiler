@@ -8,6 +8,6 @@ namespace ToyCompiler.Scanner
 {
     public class AstTranslationUnit
     {
-        public AstNode ExtDecls { get; set; }
+        public AstDeclaration ExtDecls { get; set; }
     }
 }

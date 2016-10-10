@@ -43,6 +43,7 @@
     <Compile Include="Parser\ParserContext.cs" />
     <Compile Include="Parser\ParserEngine.cs" />
     <Compile Include="Parser\ParserHelper.cs" />
+    <Compile Include="SyntaxTree\AstDeclaration.cs" />
     <Compile Include="SyntaxTree\AstDeclarator.cs" />
     <Compile Include="SyntaxTree\AstExpression.cs" />
     <Compile Include="SyntaxTree\AstFunction.cs" />
