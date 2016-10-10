@@ -173,7 +173,7 @@ namespace ToyCompiler.Scanner
         public TokenKind ParseBadChar()
         {
             SkipCurrent();
-            NextToken();
+            //NextToken();
             return TokenKind.TK_END;
         }
 

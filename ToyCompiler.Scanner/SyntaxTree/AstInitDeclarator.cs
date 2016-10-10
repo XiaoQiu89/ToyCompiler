@@ -10,6 +10,5 @@ namespace ToyCompiler.Scanner
     {
         public AstDeclarator Declarator { get; set; }
         public AstInitializer Initializer { get; set; }
-        public AstInitDeclarator Next { get; set; }
     }
 }

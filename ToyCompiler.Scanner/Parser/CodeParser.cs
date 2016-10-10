@@ -80,7 +80,6 @@ namespace ToyCompiler.Scanner
         public AstTranslationUnit ParseTranslationUnit()
         {
             AstTranslationUnit unit = new AstTranslationUnit();
-            AstNode tail = unit.ExtDecls;
 
             NextToken();
             while (CurrentToken.Kind != TokenKind.TK_END)
@@ -91,15 +90,14 @@ namespace ToyCompiler.Scanner
                     continue;
                 }
 
-                tail = ParseExternalDeclaration();
-                tail = tail.NextNode;
+                unit.ExtDecls.Add(ParseExternalDeclaration());
             }
 
 
             return unit;
         }
 
-        public AstNode ParseExternalDeclaration()
+        public AstDeclaration ParseExternalDeclaration()
         {
             AstDeclaration decl = ParseCommonHeader();
 
@@ -113,13 +111,11 @@ namespace ToyCompiler.Scanner
 
             if (CurrentToken.Kind != TokenKind.TK_SEMICOLON)
             {
-                decl.Init = ParseInitDeclarator();
-                AstInitDeclarator _next = decl.Init.Next;
+                decl.Init.Add(ParseInitDeclarator());
                 while (CurrentToken.Kind == TokenKind.TK_COMMA)
                 {
                     NextToken();
-                    _next = ParseInitDeclarator();
-                    _next = _next.Next;
+                    decl.Init.Add(ParseInitDeclarator());
                 }
             }
 

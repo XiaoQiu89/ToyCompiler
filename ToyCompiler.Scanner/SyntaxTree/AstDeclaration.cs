@@ -9,6 +9,11 @@ namespace ToyCompiler.Scanner
     public class AstDeclaration : AstNode
     {
         public AstSpecifiers Specifiers { get; set; }
-        public AstInitDeclarator Init { get; set; }
+        public IList<AstInitDeclarator> Init { get; set; }
+
+        public AstDeclaration()
+        {
+            Init = new List<AstInitDeclarator>();
+        }
     }
 }
