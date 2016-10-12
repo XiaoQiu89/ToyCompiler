@@ -8,5 +8,11 @@ namespace ToyCompiler.Scanner
 {
     public class AstInitializer
     {
+        public AstExpression Initializer { get; set; }
+
+        public AstInitializer(AstExpression init)
+        {
+            this.Initializer = init;
+        }
     }
 }
