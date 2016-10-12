@@ -13,16 +13,18 @@ namespace ToyCompiler.Scanner
     {
         private int _sourceLine;
         private int _sourceIndex;
+        private string _path;
 
         /// <summary>
         /// 源代码中的位置信息
         /// </summary>
         /// <param name="line">行号</param>
         /// <param name="index">列数</param>
-        public SourceLocation(int line, int index)
+        public SourceLocation(int line, int index,string path)
         {
             _sourceLine = line;
             _sourceIndex = index;
+            _path = path;
         }
 
         public int SourceLine
@@ -48,6 +50,12 @@ namespace ToyCompiler.Scanner
             {
                 _sourceIndex++;
             }
+        }
+
+        public string Path
+        {
+            get { return _path; }
+            set { _path = value; }
         }
     }
 }

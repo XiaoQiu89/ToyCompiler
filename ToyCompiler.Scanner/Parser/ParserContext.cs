@@ -9,6 +9,7 @@ namespace ToyCompiler.Scanner
     public class ParserContext
     {
         internal LookaheadTextReader reader;
+        private string Path;
         private SourceLocation location;
         private CodeParser parser;
         private StringBuilder _primaryBuffer = new StringBuilder();
@@ -18,10 +19,11 @@ namespace ToyCompiler.Scanner
         private const int END_OF_FILE = 255;
         private TokenKind _currentKind;
 
-        public ParserContext(LookaheadTextReader reader, CodeParser parser)
+        public ParserContext(LookaheadTextReader reader, CodeParser parser,string path)
         {
             this.reader = reader;
             this.parser = parser;
+            this.Path = path;
             //location = new SourceLocation(1, 0);
             InitParser();
         }

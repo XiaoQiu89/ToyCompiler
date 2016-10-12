@@ -13,7 +13,7 @@ namespace ToyCompiler.Scanner
             CodeParser parser = new CodeParser();
             FileStream fs = new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.None);
             TextReader tr = new StreamReader(fs);
-            ParserContext parserContext = new ParserContext(new BufferReader(tr), parser);
+            ParserContext parserContext = new ParserContext(new BufferReader(tr,path), parser,path);
             parser.Context = parserContext;
             parser.ParseFile();
         }

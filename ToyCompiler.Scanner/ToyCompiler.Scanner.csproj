@@ -43,9 +43,14 @@
     <Compile Include="Parser\ParserContext.cs" />
     <Compile Include="Parser\ParserEngine.cs" />
     <Compile Include="Parser\ParserHelper.cs" />
+    <Compile Include="SyntaxTree\AstAbstractAssign.cs" />
+    <Compile Include="SyntaxTree\AstBinaryOpExpression.cs" />
+    <Compile Include="SyntaxTree\AstCastExpression.cs" />
+    <Compile Include="SyntaxTree\AstCondExpression.cs" />
     <Compile Include="SyntaxTree\AstDeclaration.cs" />
     <Compile Include="SyntaxTree\AstDeclarator.cs" />
     <Compile Include="SyntaxTree\AstExpression.cs" />
+    <Compile Include="SyntaxTree\AstFuncallExpression.cs" />
     <Compile Include="SyntaxTree\AstFunction.cs" />
     <Compile Include="SyntaxTree\AstInitDeclarator.cs" />
     <Compile Include="SyntaxTree\AstInitializer.cs" />
@@ -53,6 +58,7 @@
     <Compile Include="SyntaxTree\AstParameterTypeList.cs" />
     <Compile Include="SyntaxTree\AstSpecifier.cs" />
     <Compile Include="SyntaxTree\AstTranslationUnit.cs" />
+    <Compile Include="SyntaxTree\AstUnaryOpExpression.cs" />
     <Compile Include="SyntaxTree\NodeKind.cs" />
     <Compile Include="SyntaxTree\TokenKind.cs" />
     <Compile Include="Parser\Token.cs" />

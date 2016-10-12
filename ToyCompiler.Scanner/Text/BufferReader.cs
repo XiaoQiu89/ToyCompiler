@@ -12,10 +12,10 @@ namespace ToyCompiler.Scanner
         private int _currentCharacter;
         private TextReader InnerReader;
 
-        public BufferReader(TextReader reader)
+        public BufferReader(TextReader reader,string path)
         {
             this.InnerReader = reader;
-            location = new SourceLocation(1, 0);
+            location = new SourceLocation(1, 0,path);
 
             UpdateCurrentCharacter();
         }
