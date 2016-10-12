@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Parser\CodeParser.cs" />
+    <Compile Include="Parser\ExpressionParser.cs" />
     <Compile Include="Parser\ParserContext.cs" />
     <Compile Include="Parser\ParserEngine.cs" />
     <Compile Include="Parser\ParserHelper.cs" />
