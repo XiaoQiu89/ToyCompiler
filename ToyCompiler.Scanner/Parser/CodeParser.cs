@@ -16,6 +16,11 @@ namespace ToyCompiler.Scanner
             set;
         }
 
+        public CodeParser(ParserContext context)
+        {
+            this.Context = context;
+        }
+
         public Token CurrentToken
         {
             get

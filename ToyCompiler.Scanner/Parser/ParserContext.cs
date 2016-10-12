@@ -11,7 +11,7 @@ namespace ToyCompiler.Scanner
         internal LookaheadTextReader reader;
         private string Path;
         private SourceLocation location;
-        private CodeParser parser;
+        //private CodeParser parser;
         private StringBuilder _primaryBuffer = new StringBuilder();
         private IDictionary<char, TokenParser> parserHandlers 
             = new Dictionary<char, TokenParser>();
@@ -19,10 +19,10 @@ namespace ToyCompiler.Scanner
         private const int END_OF_FILE = 255;
         private TokenKind _currentKind;
 
-        public ParserContext(LookaheadTextReader reader, CodeParser parser,string path)
+        public ParserContext(LookaheadTextReader reader, string path)
         {
             this.reader = reader;
-            this.parser = parser;
+            //this.parser = parser;
             this.Path = path;
             //location = new SourceLocation(1, 0);
             InitParser();
