@@ -18,6 +18,14 @@ namespace ToyCompiler.Scanner
         public delegate TokenKind TokenParser();
         private const int END_OF_FILE = 255;
         private TokenKind _currentKind;
+        private IDictionary<int, TokenKind> assignOP = new Dictionary<int, TokenKind>
+        {
+            {'+',TokenKind.TK_ADD_ASSIGN},{'-',TokenKind.TK_SUB_ASSIGN},
+            {'*',TokenKind.TK_MUL_ASSIGN},{'/',TokenKind.TK_DIV_ASSIGN},
+            {'%',TokenKind.TK_MOD_ASSIGN},{'<',TokenKind.TK_LESS_EQ},
+            {'>',TokenKind.TK_GREAT_EQ},{'&',TokenKind.TK_BITAND_ASSIGN},
+            {'^',TokenKind.TK_BITXOR_ASSIGN},{'|',TokenKind.TK_BITOR_ASSIGN}
+        };
 
         public ParserContext(LookaheadTextReader reader, string path)
         {
@@ -49,33 +57,33 @@ namespace ToyCompiler.Scanner
                 }
             }
 
-            parserHandlers['\''] = ParseSingleSynbol('\'', TokenKind.TK_INTCONST); // 解析字符
-            parserHandlers['\"'] = ParseSingleSynbol('\"', TokenKind.TK_STRING); // 解析字符串
-            parserHandlers['+'] = ParseSingleSynbol('+', TokenKind.TK_ADD);
-            parserHandlers['-'] = ParseSingleSynbol('-', TokenKind.TK_SUB);
-            parserHandlers['*'] = ParseSingleSynbol('*', TokenKind.TK_MUL);
-            parserHandlers['/'] = ParseSingleSynbol('/', TokenKind.TK_DIV);
-            parserHandlers['%'] = ParseSingleSynbol('%', TokenKind.TK_MOD);
-            parserHandlers['<'] = ParseSingleSynbol('<', TokenKind.TK_LESS);
-            parserHandlers['>'] = ParseSingleSynbol('>', TokenKind.TK_GREAT);
-            parserHandlers['!'] = ParseSingleSynbol('!', TokenKind.TK_NOT);
-            parserHandlers['='] = ParseSingleSynbol('=', TokenKind.TK_ASSIGN);
-            parserHandlers['|'] = ParseSingleSynbol('|', TokenKind.TK_BITOR);
-            parserHandlers['&'] = ParseSingleSynbol('&', TokenKind.TK_BITAND);
-            parserHandlers['^'] = ParseSingleSynbol('^', TokenKind.TK_BITXOR);
-            parserHandlers['.'] = ParseSingleSynbol('.', TokenKind.TK_DOT);
+            //parserHandlers['\''] = ParseOperatorSymbol('\'', TokenKind.TK_INTCONST); // 解析字符
+            //parserHandlers['\"'] = ParseOperatorSymbol('\"', TokenKind.TK_STRING); // 解析字符串
+            parserHandlers['+'] = ParseOperatorSymbol('+', TokenKind.TK_ADD);
+            parserHandlers['-'] = ParseOperatorSymbol('-', TokenKind.TK_SUB);
+            parserHandlers['*'] = ParseOperatorSymbol('*', TokenKind.TK_MUL);
+            parserHandlers['/'] = ParseOperatorSymbol('/', TokenKind.TK_DIV);
+            parserHandlers['%'] = ParseOperatorSymbol('%', TokenKind.TK_MOD);
+            parserHandlers['<'] = ParseOperatorSymbol('<', TokenKind.TK_LESS);
+            parserHandlers['>'] = ParseOperatorSymbol('>', TokenKind.TK_GREAT);
+            parserHandlers['!'] = ParseOperatorSymbol('!', TokenKind.TK_NOT);
+            parserHandlers['='] = ParseOperatorSymbol('=', TokenKind.TK_ASSIGN);
+            parserHandlers['|'] = ParseOperatorSymbol('|', TokenKind.TK_BITOR);
+            parserHandlers['&'] = ParseOperatorSymbol('&', TokenKind.TK_BITAND);
+            parserHandlers['^'] = ParseOperatorSymbol('^', TokenKind.TK_BITXOR);
+            parserHandlers['.'] = ParseOperatorSymbol('.', TokenKind.TK_DOT);
 
-            parserHandlers['{'] = ParseSingleSynbol('{', TokenKind.TK_LBRACE);
-            parserHandlers['}'] = ParseSingleSynbol('}', TokenKind.TK_RBRACE);
-            parserHandlers['['] = ParseSingleSynbol('[', TokenKind.TK_LBRACKET);
-            parserHandlers[']'] = ParseSingleSynbol(']', TokenKind.TK_RBRACKET);
-            parserHandlers['('] = ParseSingleSynbol('(', TokenKind.TK_LPAREN);
-            parserHandlers[')'] = ParseSingleSynbol(')', TokenKind.TK_RPAREN);
-            parserHandlers[','] = ParseSingleSynbol(',', TokenKind.TK_COMMA);
-            parserHandlers[';'] = ParseSingleSynbol(';', TokenKind.TK_SEMICOLON);
-            parserHandlers['~'] = ParseSingleSynbol('~', TokenKind.TK_COMP);
-            parserHandlers['?'] = ParseSingleSynbol('?', TokenKind.TK_QUESTION);
-            parserHandlers[':'] = ParseSingleSynbol(':', TokenKind.TK_COLON);
+            parserHandlers['{'] = ParseOperatorSymbol('{', TokenKind.TK_LBRACE);
+            parserHandlers['}'] = ParseOperatorSymbol('}', TokenKind.TK_RBRACE);
+            parserHandlers['['] = ParseOperatorSymbol('[', TokenKind.TK_LBRACKET);
+            parserHandlers[']'] = ParseOperatorSymbol(']', TokenKind.TK_RBRACKET);
+            parserHandlers['('] = ParseOperatorSymbol('(', TokenKind.TK_LPAREN);
+            parserHandlers[')'] = ParseOperatorSymbol(')', TokenKind.TK_RPAREN);
+            parserHandlers[','] = ParseOperatorSymbol(',', TokenKind.TK_COMMA);
+            parserHandlers[';'] = ParseOperatorSymbol(';', TokenKind.TK_SEMICOLON);
+            parserHandlers['~'] = ParseOperatorSymbol('~', TokenKind.TK_COMP);
+            parserHandlers['?'] = ParseOperatorSymbol('?', TokenKind.TK_QUESTION);
+            parserHandlers[':'] = ParseOperatorSymbol(':', TokenKind.TK_COLON);
         }
 
         /// <summary>
@@ -199,13 +207,36 @@ namespace ToyCompiler.Scanner
         }
 
 
-        public TokenParser ParseSingleSynbol(char symbol, TokenKind kind)
+        public TokenParser ParseOperatorSymbol(char symbol, TokenKind kind)
         {
             return () =>
             {
                 int ch = reader.Read();
                 _primaryBuffer.Append((char)ch);
-                if (ch == symbol) return kind;
+                if (ch == symbol)
+                {
+                    int nextCh = reader.Read();
+                    if (nextCh == '=') // 符合赋值操作符
+                    {
+                        if (assignOP.Keys.Contains(ch))
+                            return assignOP[ch];
+                        return TokenKind.TK_END;
+                    }
+                    if (nextCh == symbol) // ++、--
+                    {
+                        if (symbol == '+') return TokenKind.TK_INC; // ++
+                        if (symbol == '-') return TokenKind.TK_DEC; // --
+                        bool hasAssign = false;
+                        if (reader.Peek() == '=') // 检测>>,>>=,<<,<<=
+                        {
+                            hasAssign = true;
+                            reader.Read();
+                        }
+                        if (symbol == '>') return hasAssign ? TokenKind.TK_RSHIFT_ASSIGN : TokenKind.TK_RSHIFT;
+                        if (symbol == '<') return hasAssign ? TokenKind.TK_LSHIFT_ASSIGN : TokenKind.TK_LSHIFT;
+                    }
+                    return kind;
+                }
                 return TokenKind.TK_END;
             };
         }
