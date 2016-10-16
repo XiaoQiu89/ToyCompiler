@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="Parser\CodeParser.cs" />
     <Compile Include="Parser\ExpressionParser.cs" />
+    <Compile Include="Parser\OpPrecedence.cs" />
     <Compile Include="Parser\ParserContext.cs" />
     <Compile Include="Parser\ParserEngine.cs" />
     <Compile Include="Parser\ParserHelper.cs" />
@@ -55,11 +56,15 @@
     <Compile Include="SyntaxTree\AstFunction.cs" />
     <Compile Include="SyntaxTree\AstInitDeclarator.cs" />
     <Compile Include="SyntaxTree\AstInitializer.cs" />
+    <Compile Include="SyntaxTree\AstIntegerLiteralExpression.cs" />
+    <Compile Include="SyntaxTree\AstLiteralExpression.cs" />
     <Compile Include="SyntaxTree\AstNode.cs" />
     <Compile Include="SyntaxTree\AstParameterTypeList.cs" />
     <Compile Include="SyntaxTree\AstSpecifier.cs" />
+    <Compile Include="SyntaxTree\AstStringLiteralExpression.cs" />
     <Compile Include="SyntaxTree\AstTranslationUnit.cs" />
     <Compile Include="SyntaxTree\AstUnaryOpExpression.cs" />
+    <Compile Include="SyntaxTree\AstViriableExpression.cs" />
     <Compile Include="SyntaxTree\NodeKind.cs" />
     <Compile Include="SyntaxTree\TokenKind.cs" />
     <Compile Include="Parser\Token.cs" />

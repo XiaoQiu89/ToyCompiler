@@ -18,6 +18,8 @@ namespace ToyCompiler.Scanner
         public delegate TokenKind TokenParser();
         private const int END_OF_FILE = 255;
         private TokenKind _currentKind;
+        private Token _token;
+
         private IDictionary<int, TokenKind> assignOP = new Dictionary<int, TokenKind>
         {
             {'+',TokenKind.TK_ADD_ASSIGN},{'-',TokenKind.TK_SUB_ASSIGN},
@@ -85,6 +87,18 @@ namespace ToyCompiler.Scanner
             parserHandlers['?'] = ParseOperatorSymbol('?', TokenKind.TK_QUESTION);
             parserHandlers[':'] = ParseOperatorSymbol(':', TokenKind.TK_COLON);
         }
+
+        /// <summary>
+        /// 当前解析到的token词法单元
+        /// </summary>
+        public Token CurrentToken
+        {
+            get
+            {
+                return _token;
+            }
+        }
+
 
         /// <summary>
         /// 当前字符
@@ -177,7 +191,7 @@ namespace ToyCompiler.Scanner
         {
             string Num = reader.ReadUtil(ch => ParserHelper.IsDicimalDigit(ch));
             _primaryBuffer.Append(Num);
-            return TokenKind.TK_INT;
+            return TokenKind.TK_INTCONST;
         }
 
         public TokenKind ParseBadChar()
@@ -195,15 +209,25 @@ namespace ToyCompiler.Scanner
             //return token;
         }
 
-        public Token GetNextToken()
+        public void GetNextToken()
         {
             NextToken();
-            return new Token
+            _token = new Token
             {
                 Kind = _currentKind,
                 Value = _primaryBuffer.ToString(),
                 Location = location
             };
+        }
+
+        public bool DoExpect(TokenKind kind)
+        {
+            if (CurrentToken.Kind == kind)
+            {
+                GetNextToken();
+                return true;
+            }
+            return false;
         }
 
 
@@ -226,6 +250,7 @@ namespace ToyCompiler.Scanner
                     {
                         if (symbol == '+') return TokenKind.TK_INC; // ++
                         if (symbol == '-') return TokenKind.TK_DEC; // --
+                        if (symbol == '=') return TokenKind.TK_EQUAL; // ==
                         bool hasAssign = false;
                         if (reader.Peek() == '=') // 检测>>,>>=,<<,<<=
                         {

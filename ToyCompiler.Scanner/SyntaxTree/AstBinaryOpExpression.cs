@@ -11,15 +11,18 @@ namespace ToyCompiler.Scanner
     /// </summary>
     public class AstBinaryOpExpression : AstExpression
     {
-        public string Operator { get; set; }
+        public TokenKind Operator { get; set; }
         public AstExpression LeftExpr { get; set; }
         public AstExpression RightExpr { get; set; }
 
-        public AstBinaryOpExpression(string op, AstExpression le, AstExpression re)
+        public AstBinaryOpExpression(TokenKind op, AstExpression le, AstExpression re)
         {
             this.Operator = op;
             this.LeftExpr = le;
             this.RightExpr = re;
         }
+
+        public AstBinaryOpExpression()
+            : this(TokenKind.TK_END, null, null) { }
     }
 }

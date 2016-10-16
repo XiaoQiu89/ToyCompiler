@@ -14,5 +14,7 @@ namespace ToyCompiler.Scanner
         {
             this.Initializer = init;
         }
+
+        public AstInitializer() { }
     }
 }

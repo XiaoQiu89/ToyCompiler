@@ -7,8 +7,14 @@ namespace ToyCompiler.Scanner
 {
     public class CodeParser
     {
-        private Token _token;
         public bool EndOfFile { get { return Context.EndOfFile; } }
+        private ExpressionParser exParser;
+        public CodeParser(ParserContext context)
+        {
+            this.Context = context;
+            exParser = new ExpressionParser(context);
+        }
+
 
         public ParserContext Context
         {
@@ -16,20 +22,19 @@ namespace ToyCompiler.Scanner
             set;
         }
 
-        public CodeParser(ParserContext context)
-        {
-            this.Context = context;
-        }
 
         public Token CurrentToken
         {
             get
             {
-                return _token;
+                return Context.CurrentToken;
             }
         }
 
-        public char CurrentCharacter { get { return Context.CurrentCharacter; } }
+        public char CurrentCharacter
+        {
+            get { return Context.CurrentCharacter; }
+        }
 
         public void ParseFile()
         {
@@ -45,19 +50,9 @@ namespace ToyCompiler.Scanner
 
         protected void NextToken()
         {
-            _token = Context.GetNextToken();
+            Context.GetNextToken();
         }
-
-        private void DoExpect(TokenKind kind)
-        {
-            if (CurrentToken.Kind == kind)
-            {
-                _token = Context.GetNextToken();
-                return;
-            }
-        }
-
-
+        
         /// <summary>
         /// 是否是一个空格或者换行符
         /// </summary>
@@ -196,7 +191,7 @@ namespace ToyCompiler.Scanner
             if (CurrentToken.Kind == TokenKind.TK_ASSIGN)
             {
                 NextToken();
-                initDec.Initializer = null;// 解析赋值表达式
+                initDec.Initializer = exParser.ParseAssignmentExpression();// 解析赋值表达式
             }
             return initDec;
         }
@@ -225,7 +220,7 @@ namespace ToyCompiler.Scanner
                     {
                         arrDecl.Expr = null; // 解析表达式
                     }
-                    DoExpect(TokenKind.TK_RBRACKET);
+                    Context.DoExpect(TokenKind.TK_RBRACKET);
                     return arrDecl;
                 }
 
@@ -241,7 +236,7 @@ namespace ToyCompiler.Scanner
                     {
                         // 解析函数调用
                     }
-                    DoExpect(TokenKind.TK_RPAREN);
+                    Context.DoExpect(TokenKind.TK_RPAREN);
                     return funDecl;
                 }
                 else

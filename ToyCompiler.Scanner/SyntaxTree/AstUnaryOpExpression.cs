@@ -11,13 +11,21 @@ namespace ToyCompiler.Scanner
     /// </summary>
     public class AstUnaryOpExpression : AstExpression
     {
-        public string Operator { get; set; }
+        public TokenKind Operator { get; set; }
         public AstExpression Expr { get; set; }
 
-        public AstUnaryOpExpression(string op, AstExpression expr)
+        public AstUnaryOpExpression(TokenKind op, AstExpression expr)
         {
             this.Operator = op;
             this.Expr = expr;
         }
+
+        public AstUnaryOpExpression(TokenKind op)
+            : this(op, null)
+        {
+        }
+
+        public AstUnaryOpExpression()
+            : this(TokenKind.TK_END, null) { }
     }
 }
