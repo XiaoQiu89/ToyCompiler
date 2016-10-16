@@ -15,6 +15,5 @@ namespace ToyCompiler.Scanner
             this.Context = context;
         }
 
-        private 
     }
 }
