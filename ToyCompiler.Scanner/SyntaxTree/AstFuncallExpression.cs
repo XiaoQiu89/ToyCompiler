@@ -19,5 +19,8 @@ namespace ToyCompiler.Scanner
             this.Expr = expr;
             this.Args = args;
         }
+
+        public AstFuncallExpression()
+            : this(null, null) { }
     }
 }

@@ -46,6 +46,7 @@
     <Compile Include="Parser\ParserEngine.cs" />
     <Compile Include="Parser\ParserHelper.cs" />
     <Compile Include="SyntaxTree\AstAbstractAssign.cs" />
+    <Compile Include="SyntaxTree\AstArrayExpression.cs" />
     <Compile Include="SyntaxTree\AstBinaryOpExpression.cs" />
     <Compile Include="SyntaxTree\AstCastExpression.cs" />
     <Compile Include="SyntaxTree\AstCondExpression.cs" />

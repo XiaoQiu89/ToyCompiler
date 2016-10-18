@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace ToyCompiler.Scanner
 {
-    public class AstNode
+    class AstArrayExpression : AstExpression
     {
-        public NodeKind Kind { get; set; }
-        public Token Token { get; set; }
+        public AstExpression Expr { get; set; }
+        public AstExpression Index { get; set; }
     }
 }

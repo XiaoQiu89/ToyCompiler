@@ -66,14 +66,28 @@ namespace ToyCompiler.Scanner
             }
         }
 
-        public AstInitializer ParseAssignmentExpression()
+        public AstExpression ParseExpression()
         {
-            AstInitializer init = new AstInitializer()
-            {
-                Initializer = ParseConditionExpression()
-            };
+            AstExpression expr = ParseAssignmentExpression();
+            AstBinaryOpExpression exprBin;
 
-            return init;
+            while (CurrentToken.Kind == TokenKind.TK_COMMA)
+            {
+                NextToken();
+                expr = new AstBinaryOpExpression
+                {
+                    Operator = TokenKind.TK_COMMA,
+                    LeftExpr = expr,
+                    RightExpr = ParseAssignmentExpression()
+                };
+            }
+
+            return expr;
+        }
+
+        public AstExpression ParseAssignmentExpression()
+        {
+            return ParseConditionExpression();
         }
 
         public AstExpression ParseConditionExpression()
@@ -82,6 +96,16 @@ namespace ToyCompiler.Scanner
             // 检测三目运算符
             if (CurrentToken.Kind == TokenKind.TK_QUESTION)
             {
+                NextToken();
+                AstExpression Then = ParseConditionExpression();
+                NextToken();
+                Context.DoExpect(TokenKind.TK_COLON);
+                expr = new AstCondExpression
+                {
+                    Cond = expr,
+                    Then = Then,
+                    Else = ParseConditionExpression()
+                };
             }
             return expr;
         }
@@ -138,9 +162,40 @@ namespace ToyCompiler.Scanner
             AstExpression expr = ParsePrimaryExpression();
 
             // 检测变量后面的符号
+            while (true)
+            {
+                switch (CurrentToken.Kind)
+                {
+                    case TokenKind.TK_LBRACKET:
+                        NextToken();
+                        expr = new AstArrayExpression
+                        {
+                            Expr = expr,
+                            Index = ParseExpression()
+                        };
+                        Context.DoExpect(TokenKind.TK_RBRACKET);
+                        break;
+                    case TokenKind.TK_LPAREN:
+                        NextToken();
+                        IList<AstExpression> args = new List<AstExpression>();
+                        args.Add(ParseAssignmentExpression());
+                        while (CurrentToken.Kind == TokenKind.TK_COMMA)
+                        {
+                            NextToken();
+                            args.Add(ParseAssignmentExpression());
+                        }
+                        expr = new AstFuncallExpression
+                        {
+                            Expr = expr,
+                            Args = args
+                        };
+                        break;
 
-            return expr;
-            
+                    default:
+                        return expr;
+                }
+            }
+                        
         }
 
         public AstExpression ParsePrimaryExpression()
@@ -148,10 +203,10 @@ namespace ToyCompiler.Scanner
             AstExpression expr;
             switch (CurrentToken.Kind)
             {
-                case TokenKind.TK_ID:
+                case TokenKind.TK_ID: // 标示符变量
                     expr = new AstViriableExpression(CurrentToken.Value);
                     return expr;
-                case TokenKind.TK_INTCONST:
+                case TokenKind.TK_INTCONST: //int型常量
                     expr = new AstIntegerLiteralExpression
                     {
                         Kind = CurrentToken.Kind,

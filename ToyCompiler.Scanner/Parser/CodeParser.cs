@@ -191,7 +191,10 @@ namespace ToyCompiler.Scanner
             if (CurrentToken.Kind == TokenKind.TK_ASSIGN)
             {
                 NextToken();
-                initDec.Initializer = exParser.ParseAssignmentExpression();// 解析赋值表达式
+                initDec.Initializer = new AstInitializer
+                {
+                    Initializer = exParser.ParseAssignmentExpression() // 解析赋值表达式
+                };
             }
             return initDec;
         }

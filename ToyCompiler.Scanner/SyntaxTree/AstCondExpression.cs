@@ -21,5 +21,8 @@ namespace ToyCompiler.Scanner
             this.Then = t;
             this.Else = e;
         }
+
+        public AstCondExpression()
+            : this(null, null, null) { }
     }
 }
