@@ -24,5 +24,20 @@ namespace ToyCompiler.Scanner
 
         public AstCondExpression()
             : this(null, null, null) { }
+
+        public override void Dump(int n)
+        {
+            print(n);
+            Console.WriteLine("三元表达式");
+            print(++n);
+            Console.WriteLine("初始化表达式：");
+            Cond.Dump(n + 1);
+            print(n);
+            Console.WriteLine("then表达式：");
+            Then.Dump(n + 1); 
+            print(n);
+            Console.WriteLine("else表达式：");
+            Else.Dump(n + 1);
+        }
     }
 }

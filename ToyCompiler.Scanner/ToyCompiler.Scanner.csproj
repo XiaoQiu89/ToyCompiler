@@ -66,6 +66,7 @@
     <Compile Include="SyntaxTree\AstTranslationUnit.cs" />
     <Compile Include="SyntaxTree\AstUnaryOpExpression.cs" />
     <Compile Include="SyntaxTree\AstViriableExpression.cs" />
+    <Compile Include="SyntaxTree\IDump.cs" />
     <Compile Include="SyntaxTree\NodeKind.cs" />
     <Compile Include="SyntaxTree\TokenKind.cs" />
     <Compile Include="Parser\Token.cs" />

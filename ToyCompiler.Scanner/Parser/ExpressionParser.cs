@@ -69,7 +69,7 @@ namespace ToyCompiler.Scanner
         public AstExpression ParseExpression()
         {
             AstExpression expr = ParseAssignmentExpression();
-            AstBinaryOpExpression exprBin;
+            //AstBinaryOpExpression exprBin;
 
             while (CurrentToken.Kind == TokenKind.TK_COMMA)
             {
@@ -77,6 +77,7 @@ namespace ToyCompiler.Scanner
                 expr = new AstBinaryOpExpression
                 {
                     Operator = TokenKind.TK_COMMA,
+                    Token = Context.CurrentToken,
                     LeftExpr = expr,
                     RightExpr = ParseAssignmentExpression()
                 };
@@ -119,11 +120,12 @@ namespace ToyCompiler.Scanner
             OpPrecedence newOp;
             while (IsBinaryOP(CurrentToken.Kind) && ((newOp= Prec[CurrentToken.Kind]) >= op))
             {
-                TokenKind kind = CurrentToken.Kind;
+                Token token = CurrentToken;
                 NextToken();
                 expr = new AstBinaryOpExpression()
                 {
-                    Operator = kind,
+                    Operator = token.Kind,
+                    Token = token,
                     LeftExpr = expr,
                     RightExpr = ParseBinaryExpression(newOp)
                 };
@@ -149,6 +151,7 @@ namespace ToyCompiler.Scanner
                     expr = new AstUnaryOpExpression()
                     {
                         Operator = kind,
+                        Token = Context.CurrentToken,
                         Expr = ParseUnaryExpression()
                     };
                     return expr;
@@ -171,6 +174,7 @@ namespace ToyCompiler.Scanner
                         expr = new AstArrayExpression
                         {
                             Expr = expr,
+                            Token = Context.CurrentToken,
                             Index = ParseExpression()
                         };
                         Context.DoExpect(TokenKind.TK_RBRACKET);
@@ -204,12 +208,16 @@ namespace ToyCompiler.Scanner
             switch (CurrentToken.Kind)
             {
                 case TokenKind.TK_ID: // 标示符变量
-                    expr = new AstViriableExpression(CurrentToken.Value);
+                    expr = new AstViriableExpression(CurrentToken.Value)
+                    {
+                        Token = Context.CurrentToken
+                    };
                     return expr;
                 case TokenKind.TK_INTCONST: //int型常量
                     expr = new AstIntegerLiteralExpression
                     {
                         Kind = CurrentToken.Kind,
+                        Token = Context.CurrentToken,
                         Value = int.Parse(CurrentToken.Value)
                     };
                     return expr;

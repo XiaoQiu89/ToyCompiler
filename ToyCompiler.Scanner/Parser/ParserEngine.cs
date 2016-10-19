@@ -14,7 +14,8 @@ namespace ToyCompiler.Scanner
             TextReader tr = new StreamReader(fs);
             ParserContext parserContext = new ParserContext(new BufferReader(tr,path), path);
             CodeParser parser = new CodeParser(parserContext); 
-            parser.ParseFile();
+            AstTranslationUnit unit = parser.ParseFile();
+            unit.Dump();
         }
     }
 }

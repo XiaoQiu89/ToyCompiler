@@ -24,5 +24,19 @@ namespace ToyCompiler.Scanner
 
         public AstBinaryOpExpression()
             : this(TokenKind.TK_END, null, null) { }
+
+        public override void Dump(int n)
+        {
+            print(n);
+            Console.WriteLine("二元表达式");
+            print(++n);
+            Console.WriteLine("操作符为:{0},位置:{1}",Operator.ToString(),LeftExpr.Token.Location);
+            print(n);
+            Console.WriteLine("左表达式");
+            LeftExpr.Dump(n+1);
+            print(n);
+            Console.WriteLine("右表达式");
+            RightExpr.Dump(n+1);
+        }
     }
 }

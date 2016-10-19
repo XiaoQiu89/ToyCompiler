@@ -27,5 +27,12 @@ namespace ToyCompiler.Scanner
 
         public AstUnaryOpExpression()
             : this(TokenKind.TK_END, null) { }
+
+        public override void Dump(int n)
+        {
+            Console.WriteLine("一元表达式操作符为:{0},位置:{1}",Operator.ToString(),Expr.Token.Location);
+            Console.Write("表达式为:");
+            Expr.Dump(n+1);
+        }
     }
 }

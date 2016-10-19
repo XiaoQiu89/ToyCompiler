@@ -8,7 +8,10 @@ namespace ToyCompiler.Scanner
 {
     public class AstSpecifier : AstNode
     {
-        
+        public override void Dump(int n)
+        {
+            
+        }
     }
 
     public class AstSpecifiers

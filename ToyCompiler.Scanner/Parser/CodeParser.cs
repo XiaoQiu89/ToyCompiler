@@ -36,7 +36,7 @@ namespace ToyCompiler.Scanner
             get { return Context.CurrentCharacter; }
         }
 
-        public void ParseFile()
+        public AstTranslationUnit ParseFile()
         {
             //IList<Token> codes = new List<Token>();
             //do
@@ -44,8 +44,8 @@ namespace ToyCompiler.Scanner
             //    codes.Add(Context.GetNextToken());
             //} while (!EndOfFile);
 
-            AstTranslationUnit tran = ParseTranslationUnit();
-
+            AstTranslationUnit unit = ParseTranslationUnit();
+            return unit;
         }
 
         protected void NextToken()

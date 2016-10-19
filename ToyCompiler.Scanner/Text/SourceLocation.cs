@@ -57,5 +57,10 @@ namespace ToyCompiler.Scanner
             get { return _path; }
             set { _path = value; }
         }
+
+        public override string ToString()
+        {
+            return "(" + Path + " " + SourceLine + "行)"; 
+        }
     }
 }

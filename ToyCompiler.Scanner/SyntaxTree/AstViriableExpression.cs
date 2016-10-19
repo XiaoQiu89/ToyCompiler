@@ -14,5 +14,12 @@ namespace ToyCompiler.Scanner
         {
             this.Name = name;
         }
+
+        public override void Dump(int n)
+        {
+            print(n);
+            Console.WriteLine("变量为:{0},位置为：{1}",Name,Token.Location);
+            
+        }
     }
 }

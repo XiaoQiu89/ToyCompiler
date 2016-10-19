@@ -14,5 +14,13 @@ namespace ToyCompiler.Scanner
         {
             ExtDecls = new List<AstDeclaration>();
         }
+
+        public void Dump()
+        {
+            foreach (var decl in ExtDecls)
+            {
+                decl.Dump(0);
+            }
+        }
     }
 }

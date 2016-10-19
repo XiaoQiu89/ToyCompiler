@@ -15,5 +15,21 @@ namespace ToyCompiler.Scanner
         {
             Init = new List<AstInitDeclarator>();
         }
+
+        public override void Dump(int n)
+        {
+            foreach (var init in Init)
+            {
+                print(n);
+                Console.WriteLine("变量声明");
+                init.Declarator.Dump(n+1);
+                if (init.Initializer != null)
+                {
+                    print(++n);
+                    Console.WriteLine("声明赋值语句");
+                    init.Initializer.Initializer.Dump(n+1);
+                }
+            }
+        }
     }
 }
