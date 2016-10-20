@@ -239,15 +239,17 @@ namespace ToyCompiler.Scanner
                 _primaryBuffer.Append((char)ch);
                 if (ch == symbol)
                 {
-                    int nextCh = reader.Read();
+                    int nextCh = reader.Peek();
                     if (nextCh == '=') // 符合赋值操作符
                     {
+                        reader.Read();
                         if (assignOP.Keys.Contains(ch))
                             return assignOP[ch];
                         return TokenKind.TK_END;
                     }
                     if (nextCh == symbol) // ++、--
                     {
+                        reader.Read();
                         if (symbol == '+') return TokenKind.TK_INC; // ++
                         if (symbol == '-') return TokenKind.TK_DEC; // --
                         if (symbol == '=') return TokenKind.TK_EQUAL; // ==

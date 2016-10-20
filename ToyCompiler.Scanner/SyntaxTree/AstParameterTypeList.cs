@@ -6,9 +6,27 @@ using System.Threading.Tasks;
 
 namespace ToyCompiler.Scanner
 {
-    public class AstParameterTypeList : AstNode
+    public class AstParameterTypeList
     {
-        public AstParameterDeclaration ParamDecls { get; set; }
+        public IList<AstParameterDeclaration> ParamDecls { get; set; }
+
+        public AstParameterTypeList()
+        {
+            ParamDecls = new List<AstParameterDeclaration>();
+        }
+
+        public void Add(AstParameterDeclaration decl)
+        {
+            ParamDecls.Add(decl);
+        }
+
+        public void Dump(int n)
+        {
+            foreach (var param in ParamDecls)
+            {
+                param.Dump(n+1);
+            }
+        }
     }
 
     public class AstParameterDeclaration:AstNode

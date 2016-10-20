@@ -101,7 +101,15 @@ namespace ToyCompiler.Scanner
         public AstDeclaration ParseExternalDeclaration()
         {
             AstDeclaration decl = ParseCommonHeader();
-
+            if (decl.Init != null && decl.Init.Count == 1 
+                && decl.Init[0].Declarator.GetType() == typeof(AstFunctionDeclarator))
+            {
+                AstFunctionDeclarator funDecl = (AstFunctionDeclarator)decl.Init[0].Declarator;
+                if (CurrentToken.Kind != TokenKind.TK_SEMICOLON)
+                {
+                    // 解析函数体语句
+                }
+            }
             return decl;
         }
 
@@ -221,7 +229,7 @@ namespace ToyCompiler.Scanner
                     NextToken();
                     if (CurrentToken.Kind != TokenKind.TK_RBRACKET)
                     {
-                        arrDecl.Expr = null; // 解析表达式
+                        arrDecl.Expr = exParser.ParseExpression(); // 解析表达式
                     }
                     Context.DoExpect(TokenKind.TK_RBRACKET);
                     return arrDecl;
@@ -233,10 +241,17 @@ namespace ToyCompiler.Scanner
                     NextToken();
                     if (IsTypeName(CurrentToken.Kind))
                     {
-                        funDecl.ParamList = null; // 解析函数参数列表
+                        funDecl.ParamList = ParseParameterTypeList(); // 解析函数参数列表
                     }
                     else
                     {
+                        funDecl.IsFunCall = true;
+                        funDecl.ParamExps.Add(exParser.ParseExpression());
+                        while (CurrentToken.Kind == TokenKind.TK_COMMA)
+                        {
+                            NextToken();
+                            funDecl.ParamExps.Add(exParser.ParseExpression());
+                        }
                         // 解析函数调用
                     }
                     Context.DoExpect(TokenKind.TK_RPAREN);
@@ -265,6 +280,31 @@ namespace ToyCompiler.Scanner
         private bool IsTypeName(TokenKind kind)
         {
             return kind > TokenKind.TK_AUTO && kind < TokenKind.TK_VOID;
+        }
+
+        public AstParameterTypeList ParseParameterTypeList()
+        {
+            AstParameterTypeList list = new AstParameterTypeList();
+            NextToken();
+            list.Add(ParseParameterDeclaration());
+
+            while (CurrentToken.Kind == TokenKind.TK_COMMA)
+            {
+                list.Add(ParseParameterDeclaration());
+            }
+            return list;
+        }
+
+        public AstParameterDeclaration ParseParameterDeclaration()
+        {
+            AstParameterDeclaration decl = new AstParameterDeclaration()
+            {
+                Token = CurrentToken
+            };
+
+            decl.Specifiers = ParserDeclarationSpecifiers();
+            decl.Declarator = ParseDeclarator();
+            return decl;
         }
     }
 }
