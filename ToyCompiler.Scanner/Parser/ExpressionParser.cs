@@ -255,9 +255,13 @@ namespace ToyCompiler.Scanner
                 if (!ParserHelper.IsDeclaration(CurrentToken.Kind))
                 {
                     AstStatement stmt = ParseStatement();
-                    stmts.Add(stmt);
+                    if (stmt.Token != null)
+                    {
+                        stmts.Add(stmt);
+                    }
                 }
             }
+            NextToken();
 
             return stmts;
 
@@ -303,7 +307,6 @@ namespace ToyCompiler.Scanner
                 //    break;
                 default:
                     return stmt;
-                    break;
             }
             return stmt;
         }
@@ -315,6 +318,7 @@ namespace ToyCompiler.Scanner
                 Token = CurrentToken
             };
 
+            NextToken();
             stmt.LabelExpr = ParseExpression();
             stmt.Body.AddRange(ParseCompoundStatement());
 
@@ -323,7 +327,11 @@ namespace ToyCompiler.Scanner
 
         public AstStatement ParseBreakStatement()
         {
-            AstBreakStmt stmt = new AstBreakStmt();
+            AstBreakStmt stmt = new AstBreakStmt()
+            {
+                Token = CurrentToken
+            };
+            NextToken();
             Context.DoExpect(TokenKind.TK_BREAK);
             Context.DoExpect(TokenKind.TK_SEMICOLON);
             return stmt;
@@ -331,7 +339,11 @@ namespace ToyCompiler.Scanner
 
         public AstStatement ParseContinueStatement()
         {
-            AstContinueStmt stmt = new AstContinueStmt();
+            AstContinueStmt stmt = new AstContinueStmt()
+            {
+                Token = CurrentToken
+            };
+            NextToken();
             Context.DoExpect(TokenKind.TK_CONTINUE);
             Context.DoExpect(TokenKind.TK_SEMICOLON);
             return stmt;
@@ -339,7 +351,11 @@ namespace ToyCompiler.Scanner
 
         public AstStatement ParseDoStatement()
         {
-            AstDoStmt stmt = new AstDoStmt();
+            AstDoStmt stmt = new AstDoStmt()
+            {
+                Token = CurrentToken
+            };
+            NextToken();
             Context.DoExpect(TokenKind.TK_DO);
             Context.DoExpect(TokenKind.TK_LPAREN);
             stmt.Expr = ParseExpression();
@@ -351,13 +367,18 @@ namespace ToyCompiler.Scanner
 
         public AstStatement ParseIfStatement()
         {
-            AstIfStmt stmt = new AstIfStmt();
+            AstIfStmt stmt = new AstIfStmt()
+            {
+                Token = CurrentToken
+            };
+            NextToken();
             Context.DoExpect(TokenKind.TK_LPAREN);
             stmt.Expr = ParseExpression();
             Context.DoExpect(TokenKind.TK_RPAREN);
             stmt.ThenStmt = ParseCompoundStatement();
             if (CurrentToken.Kind == TokenKind.TK_ELSE)
             {
+                Context.DoExpect(TokenKind.TK_ELSE);
                 stmt.ElseStmt = ParseCompoundStatement();
             }
             return stmt;
@@ -365,7 +386,11 @@ namespace ToyCompiler.Scanner
 
         public AstStatement ParseForStatement()
         {
-            AstForStmt stmt = new AstForStmt();
+            AstForStmt stmt = new AstForStmt()
+            {
+                Token = CurrentToken
+            };
+            NextToken();
             Context.DoExpect(TokenKind.TK_LPAREN);
             stmt.Init = ParseExpression();
             Context.DoExpect(TokenKind.TK_SEMICOLON);
@@ -379,7 +404,11 @@ namespace ToyCompiler.Scanner
 
         public AstStatement ParseWhileStatement()
         {
-            AstWhileStmt stmt = new AstWhileStmt();
+            AstWhileStmt stmt = new AstWhileStmt()
+            {
+                Token = CurrentToken
+            };
+            NextToken();
             Context.DoExpect(TokenKind.TK_LPAREN);
             stmt.Expr = ParseExpression();
             Context.DoExpect(TokenKind.TK_RPAREN);
@@ -389,7 +418,11 @@ namespace ToyCompiler.Scanner
 
         public AstStatement ParseReturnStatement()
         {
-            AstReturnStmt stmt = new AstReturnStmt();
+            AstReturnStmt stmt = new AstReturnStmt()
+            {
+                Token = CurrentToken
+            };
+            NextToken();
             stmt.Expr = ParseExpression();
             Context.DoExpect(TokenKind.TK_SEMICOLON);
             return stmt;
@@ -397,7 +430,11 @@ namespace ToyCompiler.Scanner
 
         public AstStatement ParseSwitchStatement()
         {
-            AstSwitchStmt stmt = new AstSwitchStmt();
+            AstSwitchStmt stmt = new AstSwitchStmt()
+            {
+                Token = CurrentToken
+            };
+            NextToken();
             Context.DoExpect(TokenKind.TK_LPAREN);
             stmt.Expr = ParseExpression();
             Context.DoExpect(TokenKind.TK_RPAREN);
@@ -407,7 +444,11 @@ namespace ToyCompiler.Scanner
 
         public AstStatement ParseDefaultStatement()
         {
-            AstDefaultStmt stmt = new AstDefaultStmt();
+            AstDefaultStmt stmt = new AstDefaultStmt()
+            {
+                Token = CurrentToken
+            };
+            NextToken();
             Context.DoExpect(TokenKind.TK_COLON);
             stmt.Body = ParseCompoundStatement();
             return stmt;

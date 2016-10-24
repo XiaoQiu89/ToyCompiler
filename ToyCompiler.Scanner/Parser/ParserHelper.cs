@@ -125,8 +125,8 @@ namespace ToyCompiler.Scanner
 
         public static bool IsDeclaration(TokenKind kind)
         {
-            return (kind > TokenKind.TK_AUTO && kind < TokenKind.TK_VOID) ||
-                (kind > TokenKind.TK_ID && kind < TokenKind.TK_LDOUBLECONST);
+            return (kind >= TokenKind.TK_AUTO && kind <= TokenKind.TK_VOID) ||
+                (kind >= TokenKind.TK_ID && kind <= TokenKind.TK_LDOUBLECONST);
         }
     }
 }

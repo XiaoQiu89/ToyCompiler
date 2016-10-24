@@ -227,7 +227,10 @@ namespace ToyCompiler.Scanner
                 GetNextToken();
                 return true;
             }
-            return false;
+            else
+            {
+                throw new SyntaxException(CurrentToken.Kind, kind);
+            }
         }
 
 
