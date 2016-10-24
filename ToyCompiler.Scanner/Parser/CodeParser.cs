@@ -12,7 +12,7 @@ namespace ToyCompiler.Scanner
         public CodeParser(ParserContext context)
         {
             this.Context = context;
-            exParser = new ExpressionParser(context);
+            exParser = new ExpressionParser(context,this);
         }
 
 
@@ -108,6 +108,7 @@ namespace ToyCompiler.Scanner
                 if (CurrentToken.Kind != TokenKind.TK_SEMICOLON)
                 {
                     // 解析函数体语句
+                    funDecl.Body = exParser.ParseCompoundStatement();
                 }
             }
             return decl;
@@ -301,7 +302,7 @@ namespace ToyCompiler.Scanner
             {
                 Token = CurrentToken
             };
-
+            NextToken();
             decl.Specifiers = ParserDeclarationSpecifiers();
             decl.Declarator = ParseDeclarator();
             return decl;

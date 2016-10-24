@@ -34,6 +34,12 @@ namespace ToyCompiler.Scanner
         public AstParameterTypeList ParamList { get; set; }
         public bool IsFunCall { get; set; }
         public IList<AstExpression> ParamExps { get; set; }
+        public List<AstStatement> Body { get; set; }
+
+        public AstFunctionDeclarator()
+        {
+            Body = new List<AstStatement>();
+        }
 
         public override void Dump(int n)
         {

@@ -9,6 +9,7 @@ namespace ToyCompiler.Scanner
     public class ExpressionParser
     {
         private ParserContext Context;
+        private CodeParser codeParser;
         private IDictionary<TokenKind, OpPrecedence> Prec =
             new Dictionary<TokenKind, OpPrecedence>
             {
@@ -48,9 +49,10 @@ namespace ToyCompiler.Scanner
                 {TokenKind.TK_DEC,new OpPrecedence(TokenKind.TK_DEC,14,"--")}
             };
 
-        public ExpressionParser(ParserContext context)
+        public ExpressionParser(ParserContext context,CodeParser parser)
         {
             this.Context = context;
+            this.codeParser = parser;
         }
 
         private void NextToken()
@@ -230,5 +232,186 @@ namespace ToyCompiler.Scanner
         {
             return kind > TokenKind.TK_OR && kind < TokenKind.TK_MOD;
         }
+
+
+        public List<AstStatement> ParseCompoundStatement()
+        {
+            List<AstStatement> stmts = new List<AstStatement>();
+            NextToken();
+
+            while (CurrentToken.Kind != TokenKind.TK_RBRACE && CurrentToken.Kind != TokenKind.TK_END)
+            {
+                if (ParserHelper.IsDeclaration(CurrentToken.Kind))
+                {
+                    AstExprStmt stmt = new AstExprStmt()
+                    {
+                        Token = CurrentToken,
+                        Expr = codeParser.ParseExternalDeclaration()
+                    };
+                    stmts.Add(stmt);
+                    NextToken();
+                }
+
+                if (!ParserHelper.IsDeclaration(CurrentToken.Kind))
+                {
+                    AstStatement stmt = ParseStatement();
+                    stmts.Add(stmt);
+                }
+            }
+
+            return stmts;
+
+        }
+
+        public AstStatement ParseStatement()
+        {
+            AstStatement stmt = new AstStatement();
+            switch (CurrentToken.Kind)
+            {
+                case TokenKind.TK_CASE:
+                    stmt = ParseCaseStatement();
+                    break;
+                case TokenKind.TK_BREAK:
+                    stmt = ParseBreakStatement();
+                    break;
+                case TokenKind.TK_DO:
+                    stmt = ParseDoStatement();
+                    break;
+                case TokenKind.TK_DEFAULT:
+                    stmt = ParseDefaultStatement();
+                    break;
+                case TokenKind.TK_IF:
+                    stmt = ParseIfStatement();
+                    break;
+                case TokenKind.TK_FOR:
+                    stmt = ParseForStatement();
+                    break;
+                case TokenKind.TK_WHILE:
+                    stmt = ParseWhileStatement();
+                    break;
+                case TokenKind.TK_CONTINUE:
+                    stmt = ParseContinueStatement();
+                    break;
+                case TokenKind.TK_RETURN:
+                    stmt = ParseReturnStatement();
+                    break;
+                case TokenKind.TK_SWITCH:
+                    stmt = ParseSwitchStatement();
+                    break;
+                //case TokenKind.TK_LBRACE:
+
+                //    break;
+                default:
+                    return stmt;
+                    break;
+            }
+            return stmt;
+        }
+
+        public AstStatement ParseCaseStatement()
+        {
+            AstCaseStmt stmt = new AstCaseStmt()
+            {
+                Token = CurrentToken
+            };
+
+            stmt.LabelExpr = ParseExpression();
+            stmt.Body.AddRange(ParseCompoundStatement());
+
+            return stmt;
+        }
+
+        public AstStatement ParseBreakStatement()
+        {
+            AstBreakStmt stmt = new AstBreakStmt();
+            Context.DoExpect(TokenKind.TK_BREAK);
+            Context.DoExpect(TokenKind.TK_SEMICOLON);
+            return stmt;
+        }
+
+        public AstStatement ParseContinueStatement()
+        {
+            AstContinueStmt stmt = new AstContinueStmt();
+            Context.DoExpect(TokenKind.TK_CONTINUE);
+            Context.DoExpect(TokenKind.TK_SEMICOLON);
+            return stmt;
+        }
+
+        public AstStatement ParseDoStatement()
+        {
+            AstDoStmt stmt = new AstDoStmt();
+            Context.DoExpect(TokenKind.TK_DO);
+            Context.DoExpect(TokenKind.TK_LPAREN);
+            stmt.Expr = ParseExpression();
+            Context.DoExpect(TokenKind.TK_RPAREN);
+            stmt.Stmts = ParseCompoundStatement();
+            return stmt;
+        }
+
+
+        public AstStatement ParseIfStatement()
+        {
+            AstIfStmt stmt = new AstIfStmt();
+            Context.DoExpect(TokenKind.TK_LPAREN);
+            stmt.Expr = ParseExpression();
+            Context.DoExpect(TokenKind.TK_RPAREN);
+            stmt.ThenStmt = ParseCompoundStatement();
+            if (CurrentToken.Kind == TokenKind.TK_ELSE)
+            {
+                stmt.ElseStmt = ParseCompoundStatement();
+            }
+            return stmt;
+        }
+
+        public AstStatement ParseForStatement()
+        {
+            AstForStmt stmt = new AstForStmt();
+            Context.DoExpect(TokenKind.TK_LPAREN);
+            stmt.Init = ParseExpression();
+            Context.DoExpect(TokenKind.TK_SEMICOLON);
+            stmt.Cond = ParseExpression();
+            Context.DoExpect(TokenKind.TK_SEMICOLON);
+            stmt.Incr = ParseExpression();
+            Context.DoExpect(TokenKind.TK_RPAREN);
+            stmt.Stmts = ParseCompoundStatement();
+            return stmt;
+        }
+
+        public AstStatement ParseWhileStatement()
+        {
+            AstWhileStmt stmt = new AstWhileStmt();
+            Context.DoExpect(TokenKind.TK_LPAREN);
+            stmt.Expr = ParseExpression();
+            Context.DoExpect(TokenKind.TK_RPAREN);
+            stmt.Stmts = ParseCompoundStatement();
+            return stmt;
+        }
+
+        public AstStatement ParseReturnStatement()
+        {
+            AstReturnStmt stmt = new AstReturnStmt();
+            stmt.Expr = ParseExpression();
+            Context.DoExpect(TokenKind.TK_SEMICOLON);
+            return stmt;
+        }
+
+        public AstStatement ParseSwitchStatement()
+        {
+            AstSwitchStmt stmt = new AstSwitchStmt();
+            Context.DoExpect(TokenKind.TK_LPAREN);
+            stmt.Expr = ParseExpression();
+            Context.DoExpect(TokenKind.TK_RPAREN);
+            stmt.Stmts = ParseCompoundStatement();
+            return stmt;
+        }
+
+        public AstStatement ParseDefaultStatement()
+        {
+            AstDefaultStmt stmt = new AstDefaultStmt();
+            Context.DoExpect(TokenKind.TK_COLON);
+            stmt.Body = ParseCompoundStatement();
+            return stmt;
+        }
+
     }
 }

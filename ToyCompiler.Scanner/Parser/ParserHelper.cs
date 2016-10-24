@@ -122,5 +122,11 @@ namespace ToyCompiler.Scanner
                 return dic[val];
             return TokenKind.TK_ID;
         }
+
+        public static bool IsDeclaration(TokenKind kind)
+        {
+            return (kind > TokenKind.TK_AUTO && kind < TokenKind.TK_VOID) ||
+                (kind > TokenKind.TK_ID && kind < TokenKind.TK_LDOUBLECONST);
+        }
     }
 }
