@@ -13,11 +13,16 @@ namespace ToyCompiler.Scanner
     {
         public TokenKind Operator { get; set; }
         public AstExpression Expr { get; set; }
+        /// <summary>
+        /// 操作符在前面还是在后面,默认是在前面
+        /// </summary>
+        public bool IsHead { get; set; }
 
         public AstUnaryOpExpression(TokenKind op, AstExpression expr)
         {
             this.Operator = op;
             this.Expr = expr;
+            IsHead = true;
         }
 
         public AstUnaryOpExpression(TokenKind op)

@@ -43,8 +43,26 @@ namespace ToyCompiler.Scanner
 
         public override void Dump(int n)
         {
-            Declarator.Dump(n+1);
-            ParamList.Dump(n+1);
+            // 打印函数定义
+            if (IsFunCall)
+            {
+                Declarator.Dump(n + 1);
+                foreach (var param in ParamExps)
+                {
+                    param.Dump(n + 1);
+                }
+            }
+            else
+            {
+                Declarator.Dump(n + 1);
+                ParamList.Dump(n + 1);
+                print(n);
+                Console.WriteLine("函数体为:");
+                foreach (var stmt in Body)
+                {
+                    stmt.Dump(n + 1);
+                }
+            }
         }
     }
     

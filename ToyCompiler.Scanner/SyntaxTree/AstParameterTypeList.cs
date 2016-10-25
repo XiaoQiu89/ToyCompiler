@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ToyCompiler.Scanner
 {
-    public class AstParameterTypeList
+    public class AstParameterTypeList : AstNode
     {
         public IList<AstParameterDeclaration> ParamDecls { get; set; }
 
@@ -20,8 +20,10 @@ namespace ToyCompiler.Scanner
             ParamDecls.Add(decl);
         }
 
-        public void Dump(int n)
+        public override void Dump(int n)
         {
+            print(n);
+            Console.WriteLine("函数的参数列表为：");
             foreach (var param in ParamDecls)
             {
                 param.Dump(n+1);
@@ -33,5 +35,11 @@ namespace ToyCompiler.Scanner
     {
         public AstSpecifiers Specifiers { get; set; }
         public AstDeclarator Declarator { get; set; }
+
+        public override void Dump(int n)
+        {
+            Specifiers.Dump(n + 1);
+            Declarator.Dump(n + 1);
+        }
     }
 }

@@ -286,11 +286,11 @@ namespace ToyCompiler.Scanner
         public AstParameterTypeList ParseParameterTypeList()
         {
             AstParameterTypeList list = new AstParameterTypeList();
-            NextToken();
             list.Add(ParseParameterDeclaration());
 
             while (CurrentToken.Kind == TokenKind.TK_COMMA)
             {
+                NextToken();
                 list.Add(ParseParameterDeclaration());
             }
             return list;
@@ -302,7 +302,7 @@ namespace ToyCompiler.Scanner
             {
                 Token = CurrentToken
             };
-            NextToken();
+            //NextToken();
             decl.Specifiers = ParserDeclarationSpecifiers();
             decl.Declarator = ParseDeclarator();
             return decl;

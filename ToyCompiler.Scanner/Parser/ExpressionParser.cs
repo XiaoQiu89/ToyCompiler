@@ -70,6 +70,7 @@ namespace ToyCompiler.Scanner
 
         public AstExpression ParseExpression()
         {
+            
             AstExpression expr = ParseAssignmentExpression();
             //AstBinaryOpExpression exprBin;
 
@@ -117,7 +118,7 @@ namespace ToyCompiler.Scanner
         {
             AstExpression expr = ParseUnaryExpression();
             //AstExpression binExpr;
-            NextToken();
+            // NextToken();
 
             OpPrecedence newOp;
             while (IsBinaryOP(CurrentToken.Kind) && ((newOp= Prec[CurrentToken.Kind]) >= op))
@@ -169,6 +170,7 @@ namespace ToyCompiler.Scanner
             // 检测变量后面的符号
             while (true)
             {
+                //NextToken();
                 switch (CurrentToken.Kind)
                 {
                     case TokenKind.TK_LBRACKET:
@@ -196,6 +198,17 @@ namespace ToyCompiler.Scanner
                             Args = args
                         };
                         break;
+                    case TokenKind.TK_INC:
+                    case TokenKind.TK_DEC:
+                        expr = new AstUnaryOpExpression()
+                        {
+                            Operator = CurrentToken.Kind,
+                            Token = Context.CurrentToken,
+                            Expr = expr,
+                            IsHead = false
+                        };
+                        NextToken();
+                        return expr;
 
                     default:
                         return expr;
@@ -214,6 +227,7 @@ namespace ToyCompiler.Scanner
                     {
                         Token = Context.CurrentToken
                     };
+                    NextToken();
                     return expr;
                 case TokenKind.TK_INTCONST: //int型常量
                     expr = new AstIntegerLiteralExpression
@@ -222,6 +236,7 @@ namespace ToyCompiler.Scanner
                         Token = Context.CurrentToken,
                         Value = int.Parse(CurrentToken.Value)
                     };
+                    NextToken();
                     return expr;
                 default:
                     return null;
@@ -392,7 +407,7 @@ namespace ToyCompiler.Scanner
             };
             NextToken();
             Context.DoExpect(TokenKind.TK_LPAREN);
-            stmt.Init = ParseExpression();
+            stmt.Init = codeParser.ParseExternalDeclaration();
             Context.DoExpect(TokenKind.TK_SEMICOLON);
             stmt.Cond = ParseExpression();
             Context.DoExpect(TokenKind.TK_SEMICOLON);
