@@ -248,11 +248,14 @@ namespace ToyCompiler.Scanner
             return kind > TokenKind.TK_OR && kind < TokenKind.TK_MOD;
         }
 
-
-        public List<AstStatement> ParseCompoundStatement()
+        /// <summary>
+        /// 添加一个是否只执行一次的参数，如果只想执行一次，也就是解析一个语句，
+        /// 使用参数true，针对没有"{"、"}"的if语句，case语句
+        /// </summary>
+        public List<AstStatement> ParseCompoundStatement(bool OnlyOnce = false)
         {
             List<AstStatement> stmts = new List<AstStatement>();
-            NextToken();
+            if (!OnlyOnce) NextToken();
 
             while (CurrentToken.Kind != TokenKind.TK_RBRACE && CurrentToken.Kind != TokenKind.TK_END)
             {
@@ -265,6 +268,7 @@ namespace ToyCompiler.Scanner
                     };
                     stmts.Add(stmt);
                     NextToken();
+                    if (OnlyOnce) break;
                 }
 
                 if (!ParserHelper.IsDeclaration(CurrentToken.Kind))
@@ -274,9 +278,10 @@ namespace ToyCompiler.Scanner
                     {
                         stmts.Add(stmt);
                     }
+                    if (OnlyOnce) break;
                 }
             }
-            NextToken();
+            if(!OnlyOnce) NextToken();
 
             return stmts;
 
@@ -337,11 +342,15 @@ namespace ToyCompiler.Scanner
             stmt.LabelExpr = ParseExpression();
             Context.DoExpect(TokenKind.TK_COLON);
             AstStatement body = new AstStatement();
-            while (body.GetType() != typeof(AstBreakStmt) ||
-                body.GetType() != typeof(AstReturnStmt))
+            while (CurrentToken.Kind != TokenKind.TK_RBRACE)
             {
-                body = ParseStatement();
-                stmt.Body.Add(body);
+                stmt.Body.AddRange(ParseCompoundStatement(true));
+                if (CurrentToken.Kind == TokenKind.TK_BREAK ||
+                    CurrentToken.Kind == TokenKind.TK_RETURN)
+                {
+                    stmt.Body.AddRange(ParseCompoundStatement(true));
+                    break;
+                }
             }
 
             return stmt;
@@ -396,11 +405,12 @@ namespace ToyCompiler.Scanner
             Context.DoExpect(TokenKind.TK_LPAREN);
             stmt.Expr = ParseExpression();
             Context.DoExpect(TokenKind.TK_RPAREN);
-            stmt.ThenStmt = ParseCompoundStatement();
+            // 如果if语句后面跟的有"{"符号，解析多行，如果没有的话，则只解析一行
+            stmt.ThenStmt = ParseCompoundStatement(CurrentToken.Kind != TokenKind.TK_LBRACE);
             if (CurrentToken.Kind == TokenKind.TK_ELSE)
             {
                 Context.DoExpect(TokenKind.TK_ELSE);
-                stmt.ElseStmt = ParseCompoundStatement();
+                stmt.ElseStmt = ParseCompoundStatement(CurrentToken.Kind != TokenKind.TK_LBRACE);
             }
             return stmt;
         }
