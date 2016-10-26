@@ -335,7 +335,14 @@ namespace ToyCompiler.Scanner
 
             NextToken();
             stmt.LabelExpr = ParseExpression();
-            stmt.Body.AddRange(ParseCompoundStatement());
+            Context.DoExpect(TokenKind.TK_COLON);
+            AstStatement body = new AstStatement();
+            while (body.GetType() != typeof(AstBreakStmt) ||
+                body.GetType() != typeof(AstReturnStmt))
+            {
+                body = ParseStatement();
+                stmt.Body.Add(body);
+            }
 
             return stmt;
         }
@@ -346,7 +353,6 @@ namespace ToyCompiler.Scanner
             {
                 Token = CurrentToken
             };
-            NextToken();
             Context.DoExpect(TokenKind.TK_BREAK);
             Context.DoExpect(TokenKind.TK_SEMICOLON);
             return stmt;
